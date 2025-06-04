@@ -51,9 +51,7 @@ const registerSchema = z
         "A senha deve conter pelo menos uma letra maiúscula, uma minúscula e um número"
       ),
     confirmPassword: z.string(),
-    acceptTerms: z
-      .boolean()
-      .refine((val) => val === true, "Você deve aceitar os termos e condições"),
+    acceptTerms: z.boolean().optional(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "As senhas não coincidem",

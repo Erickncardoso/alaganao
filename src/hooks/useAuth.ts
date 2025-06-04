@@ -29,7 +29,7 @@ export interface RegisterData {
   email: string;
   password: string;
   confirmPassword: string;
-  acceptTerms: boolean;
+  acceptTerms?: boolean;
   phone?: string;
   location?: string;
 }
@@ -213,7 +213,6 @@ export const useAuth = () => {
       console.log("🔍 DEBUG - Iniciando registro:", {
         email: data.email,
         fullName: data.fullName,
-        acceptTerms: data.acceptTerms,
         passwordLength: data.password?.length || 0,
         confirmPasswordLength: data.confirmPassword?.length || 0,
       });
@@ -222,17 +221,6 @@ export const useAuth = () => {
       if (data.password !== data.confirmPassword) {
         const errorMessage = "As senhas não coincidem";
         console.log("❌ Erro de validação - Senhas diferentes");
-        toast({
-          title: "Erro no cadastro",
-          description: errorMessage,
-          variant: "destructive",
-        });
-        return { success: false, error: errorMessage };
-      }
-
-      if (!data.acceptTerms) {
-        const errorMessage = "Você deve aceitar os termos de uso";
-        console.log("❌ Erro de validação - Termos não aceitos");
         toast({
           title: "Erro no cadastro",
           description: errorMessage,
