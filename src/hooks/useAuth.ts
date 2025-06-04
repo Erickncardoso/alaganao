@@ -210,9 +210,18 @@ export const useAuth = () => {
     try {
       setLoading(true);
 
+      console.log("🔍 DEBUG - Iniciando registro:", {
+        email: data.email,
+        fullName: data.fullName,
+        acceptTerms: data.acceptTerms,
+        passwordLength: data.password?.length || 0,
+        confirmPasswordLength: data.confirmPassword?.length || 0,
+      });
+
       // Validar senhas
       if (data.password !== data.confirmPassword) {
         const errorMessage = "As senhas não coincidem";
+        console.log("❌ Erro de validação - Senhas diferentes");
         toast({
           title: "Erro no cadastro",
           description: errorMessage,
@@ -223,6 +232,7 @@ export const useAuth = () => {
 
       if (!data.acceptTerms) {
         const errorMessage = "Você deve aceitar os termos de uso";
+        console.log("❌ Erro de validação - Termos não aceitos");
         toast({
           title: "Erro no cadastro",
           description: errorMessage,
@@ -230,6 +240,8 @@ export const useAuth = () => {
         });
         return { success: false, error: errorMessage };
       }
+
+      console.log("✅ Validações passaram, chamando Supabase...");
 
       const { error } = await supabase.auth.signUp({
         email: data.email,
@@ -243,6 +255,8 @@ export const useAuth = () => {
           emailRedirectTo: `${window.location.origin}/login?confirmed=true`,
         },
       });
+
+      console.log("📡 Resposta do Supabase:", { error });
 
       if (error) {
         let errorMessage = "Erro ao criar conta";
@@ -264,6 +278,8 @@ export const useAuth = () => {
             errorMessage = error.message;
         }
 
+        console.log("❌ Erro do Supabase:", errorMessage);
+
         toast({
           title: "Erro no cadastro",
           description: errorMessage,
@@ -273,6 +289,8 @@ export const useAuth = () => {
         return { success: false, error: errorMessage };
       }
 
+      console.log("🎉 Registro realizado com sucesso!");
+
       toast({
         title: "Conta criada com sucesso!",
         description: "Verifique seu email para confirmar a conta e fazer login",
@@ -280,7 +298,7 @@ export const useAuth = () => {
 
       return { success: true };
     } catch (error) {
-      console.error("Erro no registro:", error);
+      console.error("💥 Erro inesperado no registro:", error);
       const errorMessage = "Erro inesperado ao criar conta";
 
       toast({
