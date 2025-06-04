@@ -1,14 +1,28 @@
 {
-  "name": "vite_react_shadcn_ts",
+  "name": "alaganao-pwa",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "build:dev": "vite build --mode development",
+    "build:production": "vite build --mode production",
+    "build:analyze": "vite build --mode production && npx vite-bundle-analyzer dist/assets",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "lint:fix": "eslint . --fix",
+    "lint:check": "eslint . --max-warnings 100",
+    "preview": "vite preview",
+    "preview:build": "npm run build && npm run preview",
+    "generate-icons": "node scripts/generate-pwa-icons.cjs",
+    "predeploy": "npm run generate-icons && npm run lint:check && npm run build:production",
+    "predeploy:force": "npm run generate-icons && npm run build:production",
+    "deploy": "vercel",
+    "deploy:production": "vercel --prod",
+    "test:lighthouse": "npx lighthouse http://localhost:4173 --view",
+    "test:pwa": "npx lighthouse http://localhost:4173 --only-categories=pwa --view",
+    "clean": "rm -rf dist node_modules/.vite",
+    "update-deps": "npm update && npm audit fix"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
@@ -82,6 +96,7 @@
     "lovable-tagger": "^1.1.7",
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.11",
+    "terser": "^5.40.0",
     "typescript": "^5.5.3",
     "typescript-eslint": "^8.0.1",
     "vite": "^5.4.1"

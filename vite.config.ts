@@ -18,9 +18,11 @@ export default defineConfig(({ mode }) => ({
     },
   },
   build: {
-    // Configurações para PWA
+    // Configurações para PWA e Vercel
     outDir: "dist",
-    sourcemap: true,
+    sourcemap: mode === "development",
+    minify: "terser",
+    target: "esnext",
     rollupOptions: {
       output: {
         // Service Worker deve estar na raiz
@@ -28,15 +30,62 @@ export default defineConfig(({ mode }) => ({
           if (assetInfo.name === "sw.js") {
             return "sw.js";
           }
-          return "assets/[name]-[hash][extname]";
+          const extType = assetInfo.name?.split(".").at(1);
+          if (/png|jpe?g|svg|gif|tiff|bmp|ico/i.test(extType ?? "")) {
+            return `assets/images/[name]-[hash][extname]`;
+          }
+          if (/css/i.test(extType ?? "")) {
+            return `assets/css/[name]-[hash][extname]`;
+          }
+          return `assets/[name]-[hash][extname]`;
         },
+        chunkFileNames: "assets/js/[name]-[hash].js",
+        entryFileNames: "assets/js/[name]-[hash].js",
+        // Manual chunks para melhor cache e performance
+        manualChunks: {
+          vendor: ["react", "react-dom"],
+          ui: [
+            "@radix-ui/react-dialog",
+            "@radix-ui/react-dropdown-menu",
+            "lucide-react",
+          ],
+          motion: ["motion"],
+          supabase: ["@supabase/supabase-js"],
+          router: ["react-router-dom"],
+          maps: ["leaflet", "react-leaflet"],
+        },
+      },
+    },
+    // Aumentar limite de chunk para remover warnings
+    chunkSizeWarningLimit: 1000,
+    terserOptions: {
+      compress: {
+        drop_console: mode === "production",
+        drop_debugger: mode === "production",
       },
     },
   },
   // Configurações para desenvolvimento PWA
   define: {
-    "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV),
+    "process.env.NODE_ENV": JSON.stringify(mode),
+    __APP_VERSION__: JSON.stringify(process.env.npm_package_version),
   },
   // Configurar assets públicos
   publicDir: "public",
+  // Otimizações para Vercel
+  esbuild: {
+    target: "esnext",
+    platform: "browser",
+    treeShaking: true,
+  },
+  optimizeDeps: {
+    include: [
+      "react",
+      "react-dom",
+      "react-router-dom",
+      "@supabase/supabase-js",
+      "motion",
+      "lucide-react",
+    ],
+  },
 }));
