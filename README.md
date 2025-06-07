@@ -1,4 +1,8 @@
-# 🌊 Flood Watch Community
+# 🌊 Alaganao
+
+https://github.com/Erickncardoso/GS2025
+
+app ativo: https://alaganaoo.vercel.app/
 
 Sistema comunitário de alerta e monitoramento de enchentes em tempo real.
 
